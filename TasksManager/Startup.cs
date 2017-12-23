@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using TasksManager.DataAccess.DbImplementation.Projects;
 using TasksManager.DataAccess.Projects;
 using TasksManager.Db;
+using Microsoft.AspNetCore.Identity;
 
 namespace TasksManager
 {
@@ -32,6 +33,16 @@ namespace TasksManager
                 .UseSqlServer(Configuration.GetConnectionString("TasksContext"))
                 .EnableSensitiveDataLogging());
 
+            //identity
+            services.AddDbContext<IdentityContext>(options => options
+                .UseSqlServer(Configuration.GetConnectionString("TasksContext"))
+            );
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<IdentityContext>()
+                .AddDefaultTokenProviders()
+                ;
+
+            ///identity
             RegisterQueriesAndCommands(services);
             // Add framework services.
             services.AddMvc();
@@ -50,7 +61,7 @@ namespace TasksManager
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            app.UseAuthentication();
             app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.

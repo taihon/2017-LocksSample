@@ -1,22 +1,20 @@
 ﻿using System.IO;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 
 namespace TasksManager
 {
-    public class Program
-    {
-        public static void Main(string[] args)
+        public class Program
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                //.UseApplicationInsights()
-                .Build();
+            public static void Main(string[] args)
+            {
+                BuildWebHost(args).Run();
+            }
 
-            host.Run();
+            public static IWebHost BuildWebHost(string[] args) =>
+                WebHost.CreateDefaultBuilder(args)
+                    .UseStartup<Startup>()
+                    .Build();
         }
-    }
 }
