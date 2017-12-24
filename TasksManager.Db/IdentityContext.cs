@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TasksManager.Entities;
 
 namespace TasksManager.Db
 {
@@ -13,5 +14,6 @@ namespace TasksManager.Db
         {
 
         }
+        public DbSet<ObjectPermission> ObjectPermissions { get; set; }
     }
 }
