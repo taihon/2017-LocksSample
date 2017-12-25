@@ -10,7 +10,7 @@ using TasksManager.ViewModel.Auth;
 
 namespace TasksManager.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     public class AccountsController : Controller
     {
         private readonly IAuthService authorizationService;

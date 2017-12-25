@@ -68,6 +68,13 @@ namespace TasksManager
                         };
                     }
                 );
+            services.Configure<IdentityOptions>(
+                opts => {
+                    opts.Password.RequireDigit = false;
+                    opts.Password.RequiredLength = 4;
+                    opts.Password.RequireNonAlphanumeric = false;
+                    opts.Password.RequireUppercase = false;
+            });
             services.AddScoped<IAuthService, AuthService>();
             ///identity
             RegisterQueriesAndCommands(services);

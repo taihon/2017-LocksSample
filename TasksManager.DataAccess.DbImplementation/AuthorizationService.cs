@@ -70,12 +70,13 @@ namespace TasksManager.DataAccess.DbImplementation
         {
             var identity = new ClaimsIdentity(JwtBearerDefaults.AuthenticationScheme);
             identity.AddClaim(new Claim(ClaimTypes.Name, username));
+            identity.AddClaim(new Claim("UserId", user.Id));
             var claims = await userManager.GetClaimsAsync(user);
             identity.AddClaims(claims);
             var jwt = new JwtSecurityToken(
                 issuer:AuthOptions.Issuer,
                 audience:AuthOptions.Audience,
-                claims: claims,
+                claims: identity.Claims,
                 signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(),SecurityAlgorithms.HmacSha256),
                 expires: DateTime.UtcNow.Add(TimeSpan.FromSeconds(120))
                 );
