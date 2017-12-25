@@ -9,6 +9,11 @@ using TasksManager.DataAccess.DbImplementation.Projects;
 using TasksManager.DataAccess.Projects;
 using TasksManager.Db;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using TasksManager.DataAccess.DbImplementation;
+using TasksManager.DataAccess;
 
 namespace TasksManager
 {
@@ -41,7 +46,29 @@ namespace TasksManager
                 .AddEntityFrameworkStores<IdentityContext>()
                 .AddDefaultTokenProviders()
                 ;
-
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opts =>
+                    {
+                        opts.RequireHttpsMetadata = false;
+                        opts.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateAudience = true,
+                            ValidAudience = AuthOptions.Audience,
+                            ValidateIssuer = true,
+                            ValidIssuer = AuthOptions.Issuer,
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                            LifetimeValidator = (DateTime? notBefore, DateTime? expires,
+                                SecurityToken token, TokenValidationParameters parameters) =>
+                                {
+                                    if (expires != null)
+                                        return DateTime.UtcNow < expires;
+                                    return false;
+                                }
+                        };
+                    }
+                );
+            services.AddScoped<IAuthService, AuthService>();
             ///identity
             RegisterQueriesAndCommands(services);
             // Add framework services.
@@ -61,6 +88,7 @@ namespace TasksManager
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            app.UseStaticFiles();
             app.UseAuthentication();
             app.UseMvc();
 
