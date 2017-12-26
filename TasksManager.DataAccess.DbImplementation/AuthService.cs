@@ -63,7 +63,11 @@ namespace TasksManager.DataAccess.DbImplementation
                 await signInManager.SignInAsync(user, false);
                 return await GenerateToken(username, user);
             }
-            return null;
+            return new AuthorizeResponse
+            {
+                Errors = new List<IdentityError>(registrationResult.Errors)
+                    .ConvertAll(t => t.Description)
+            }; ;
         }
 
         private async Task<AuthorizeResponse> GenerateToken(string username, IdentityUser user)

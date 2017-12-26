@@ -33,11 +33,11 @@ namespace TasksManager.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             var response = await authorizationService.RegisterAsync(request.Username, request.Password);
-            if (response!=null)
+            if (response.Errors.Count==0)
             {
                 return Ok(response);
             }
-            return BadRequest("Registration Failed.");
+            return BadRequest($"Registration Failed. {string.Join(Environment.NewLine,response.Errors)}");
         }
     }
 }

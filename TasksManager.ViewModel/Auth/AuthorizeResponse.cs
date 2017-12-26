@@ -7,5 +7,6 @@ namespace TasksManager.ViewModel.Auth
     public class AuthorizeResponse
     {
         public string Token { get; set; }
+        public List<string> Errors { get; set; }
     }
 }
