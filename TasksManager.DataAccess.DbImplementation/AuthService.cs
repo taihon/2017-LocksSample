@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -19,17 +20,20 @@ namespace TasksManager.DataAccess.DbImplementation
         private readonly IdentityContext context;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly UserManager<IdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration configuration;
 
         public AuthService(
             IdentityContext context, 
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             IConfiguration configuration)
         {
             this.context = context;
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.configuration = configuration;
         }
         public async Task<bool> AuthorizeAsync(string userId, string activity, string objectName, int id)
@@ -86,6 +90,21 @@ namespace TasksManager.DataAccess.DbImplementation
                 );
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
             return new AuthorizeResponse { Token = encodedJwt };
+        }
+        public async Task<string[]> GetRolesAsync()
+        {
+            var roles = await roleManager.Roles.ToListAsync();
+            if (roles != null)
+            {
+                return roles.ConvertAll(r=>r.Name).ToArray();
+            }
+            return Array.Empty<string>();
+        }
+        public async Task<string[]> GetClaimsAsync(string roleId)
+        {
+            var role = await roleManager.FindByIdAsync(roleId);
+            var claims = await roleManager.GetClaimsAsync(role);
+            return claims.Select(cl=>cl.Value).ToArray();
         }
     }
 }
